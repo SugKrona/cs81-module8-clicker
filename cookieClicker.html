@@ -16,12 +16,13 @@
             background-color: #f0f8ff; 
         }
         #cookieButton {
-            font-size: 5rem; 
+            font-size: 8rem; 
             background: none;
             border: none;
             cursor: pointer;
             outline: none;
             margin-bottom: 20px;
+            transition: font-size 0.2s ease-out; 
         }
         #counterDisplay {
             font-size: 2.5rem;
@@ -31,7 +32,27 @@
         #messageDisplay {
             font-size: 1.2rem;
             color: #555;
-            min-height: 30px;
+            min-height: 30px; 
+        }
+        
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake-active {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0); 
+            backface-visibility: hidden;
+            perspective: 1000px;
         }
     </style>
 </head>
@@ -46,21 +67,55 @@
         const messageDisplay = document.getElementById("messageDisplay");
 
         let clickCount = 0;
+        let cookieSize = 8; 
+        const finalGrowthClickCap = 200; 
 
         cookieButton.addEventListener("click", function() {
-            clickCount++; 
-            counterDisplay.textContent = `Clicks: ${clickCount}`; 
+            clickCount++;
+            counterDisplay.textContent = `Clicks: ${clickCount}`;
 
-            if (clickCount === 10) { 
+            let shouldShake = false;
+
+            if (clickCount === 10) {
                 messageDisplay.textContent = "You're just getting started!";
-            } else if (clickCount === 25) { 
+                cookieSize = 9.5;
+                shouldShake = true;
+            } else if (clickCount === 25) {
                 messageDisplay.textContent = "Wow, that's a lot of cookies!";
-            } else if (clickCount === 50) { 
+                cookieSize = 11;
+                shouldShake = true;
+            } else if (clickCount === 50) {
                 messageDisplay.textContent = "Are you still clicking?";
-            } else if (clickCount === 100) { 
+                cookieSize = 13;
+                shouldShake = true;
+            } else if (clickCount === 100) {
                 messageDisplay.textContent = "You win! Maybe take a break.";
-            } else if (clickCount > 100 && clickCount % 50 === 0) {
-                messageDisplay.textContent = `Still going strong at ${clickCount} clicks!`;
+                cookieSize = 15;
+                shouldShake = true;
+            } else if (clickCount === 150) { 
+                messageDisplay.textContent = "Halfway to maximum size!";
+                cookieSize = 16;
+                shouldShake = true;
+            } else if (clickCount === 175) { 
+                messageDisplay.textContent = "Almost there! Keep going!";
+                cookieSize = 16.5;
+                shouldShake = true;
+            } else if (clickCount === finalGrowthClickCap) { 
+                messageDisplay.textContent = "You've reached max cookie size! It won't grow bigger now.";
+                cookieSize = 17; 
+                shouldShake = true;
+            } else if (clickCount > finalGrowthClickCap && clickCount % 50 === 0) { 
+                messageDisplay.textContent = `Still going strong at ${clickCount} clicks! But the cookie won't grow anymore.`;
+                shouldShake = true; 
+            }
+
+            cookieButton.style.fontSize = `${cookieSize}rem`;
+
+            if (shouldShake) {
+                document.body.classList.add('shake-active');
+                setTimeout(() => {
+                    document.body.classList.remove('shake-active');
+                }, 500);
             }
         });
     </script>
